@@ -61,21 +61,12 @@ def get_access_token(request, code_grant):
     headers = get_headers_dict(request.settings.oauth2_token_extra_headers)
 
     try:
-        if request.settings.oauth2_token_method == "GET":
-            token_url += "&" if "?" in token_url else "?"
-            token_url += urlencode(data)
-            r = requests.get(
-                token_url,
-                headers=headers,
-                timeout=REQUESTS_TIMEOUT,
-            )
-        else:
-            r = requests.post(
-                token_url,
-                data=data,
-                headers=headers,
-                timeout=REQUESTS_TIMEOUT,
-            )
+        r = requests.post(
+            token_url,
+            data=data,
+            headers=headers,
+            timeout=REQUESTS_TIMEOUT,
+        )
     except RequestException:
         raise exceptions.OAuth2AccessTokenRequestError()
 
@@ -138,10 +129,12 @@ def get_user_data(request, access_token):
     except (ValueError, TypeError):
         raise exceptions.OAuth2UserDataJSONError()
 
-    return {
+    clean_data = {
         key: get_value_from_json(getattr(request.settings, setting), response_json)
         for key, setting in JSON_MAPPING.items()
     }
+
+    return clean_data, response_json
 
 
 def get_redirect_uri(request):
