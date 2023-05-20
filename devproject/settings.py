@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 
 from misago import load_plugin_list_if_exists
+from misago.settings import *
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -163,49 +164,10 @@ PLUGINS_LIST_PATH = os.path.join(os.path.dirname(BASE_DIR), "plugins.txt")
 
 INSTALLED_PLUGINS = load_plugin_list_if_exists(PLUGINS_LIST_PATH) or []
 
-INSTALLED_APPS = INSTALLED_PLUGINS + [
-    # Misago overrides for Django core feature
-    "misago",
-    "misago.users",
-    # Django apps
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.postgres",
-    "django.contrib.humanize",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    # 3rd party apps used by Misago
-    "ariadne_django",
-    "celery",
-    "debug_toolbar",
-    "mptt",
-    "rest_framework",
-    "social_django",
-    # Misago apps
-    "misago.admin",
-    "misago.acl",
-    "misago.analytics",
-    "misago.cache",
-    "misago.core",
-    "misago.conf",
-    "misago.icons",
-    "misago.themes",
-    "misago.markup",
-    "misago.legal",
-    "misago.notifications",
-    "misago.categories",
-    "misago.threads",
-    "misago.readtracker",
-    "misago.search",
-    "misago.oauth2",
-    "misago.socialauth",
-    "misago.graphql",
-    "misago.faker",
-    "misago.menus",
-    "misago.plugins",
-    "misago.apiv2",
+# Combine Misago's default installed apps with plugins
+INSTALLED_APPS = [
+    *INSTALLED_PLUGINS,
+    *INSTALLED_APPS,
 ]
 
 INTERNAL_IPS = ["127.0.0.1"]
@@ -279,40 +241,7 @@ TEMPLATES = [
         "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.i18n",
-                "django.template.context_processors.media",
-                "django.template.context_processors.request",
-                "django.template.context_processors.static",
-                "django.template.context_processors.tz",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-                "misago.acl.context_processors.user_acl",
-                "misago.conf.context_processors.conf",
-                "misago.conf.context_processors.og_image",
-                "misago.core.context_processors.misago_version",
-                "misago.core.context_processors.request_path",
-                "misago.core.context_processors.momentjs_locale",
-                "misago.icons.context_processors.icons",
-                "misago.search.context_processors.search_providers",
-                "misago.themes.context_processors.theme",
-                "misago.legal.context_processors.legal_links",
-                "misago.menus.context_processors.menus",
-                "misago.users.context_processors.user_links",
-                "misago.core.context_processors.hooks",
-                # Data preloaders
-                "misago.conf.context_processors.preload_settings_json",
-                "misago.core.context_processors.current_link",
-                "misago.markup.context_processors.preload_api_url",
-                "misago.threads.context_processors.preload_threads_urls",
-                "misago.users.context_processors.preload_user_json",
-                "misago.categories.context_processors.preload_categories_json",
-                "misago.socialauth.context_processors.preload_socialauth_json",
-                # Note: keep frontend_context processor last for previous processors
-                # to be able to expose data UI app via request.frontend_context
-                "misago.core.context_processors.frontend_context",
-            ]
+            "context_processors": TEMPLATE_CONTEXT_PROCESSORS,
         },
     }
 ]
